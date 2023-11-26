@@ -1,4 +1,5 @@
-import { Browser } from "puppeteer"
+import * as puppeteer from 'puppeteer'
+import axios from 'axios'
 
 export class Oatstalk {
   constructor(tubename: string, serverAddress: string)
@@ -30,6 +31,11 @@ export class BaseWorker {
 }
 
 export class PuppeteerWorker extends BaseWorker {
-  browser: Browser
+  browser: puppeteer.Browser
   async handler(job: string | number): void
+}
+
+export {
+  puppeteer,
+  axios,
 }
