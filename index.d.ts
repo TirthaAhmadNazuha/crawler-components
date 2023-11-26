@@ -1,4 +1,4 @@
-import * as puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import axios from 'axios'
 
 export class Oatstalk {
@@ -6,8 +6,8 @@ export class Oatstalk {
   tubename: string
   serverAddress: string
   url: string
-  put(size: number): string | Object<string, any> | null
-  body(body: string | Object<string, any> | any, spreading: false): boolean
+  put(size: number): Promise<string | Object<string, any> | null>
+  body(body: string | Object<string, any> | any, spreading: false): Promise<boolean>
 }
 
 interface OptionsWorker {
@@ -26,16 +26,26 @@ export class BaseWorker {
   start(): Promise<void>
   handler(job: string | number): Promise<void>
   preStart(): Promise<void>
+  setup(): Promise<void>
   onJobEmpty(): Promise<void>
   onSchedule(): Promise<void>
 }
 
 export class PuppeteerWorker extends BaseWorker {
   browser: puppeteer.Browser
-  async handler(job: string | number): void
+}
+
+export class BasePusher<scheduleInterval> {
+  constructor(tubename: string, scheduleInterval: scheduleInterval | 30000): void
+  pusherId: string
+  oatstalk: Oatstalk
+  interval: scheduleInterval | 30000
+  start(): Promise<void>
+  handler(): Promise<void>
+  setup(): Promise<void>
 }
 
 export {
-  puppeteer,
+  launch,
   axios,
 }

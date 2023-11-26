@@ -1,18 +1,12 @@
 import BaseWorker from './base.js';
-import { launch, Browser } from 'puppeteer';
+import { launch } from 'puppeteer';
 
 class PuppeteerWorker extends BaseWorker {
   async preStart() {
     this.browser = await launch({ headless: false });
-    this.args = (this.options?.args || []).unshift(this.browser);
+    await this.setup();
   }
 
-  /**
-   * 
-   * @param {(string | number)} job 
-   * @param {Browser} browser 
-   * @param  {...any} args 
-   */
   async handler(job) {
     throw new Error('handler not implemented');
   }

@@ -10,8 +10,8 @@ class BaseWorker {
     this.options = options;
     this.workStack = options?.workStack || 1;
     this.args = options?.args || [];
-
     this.start = this.start.bind(this);
+    this.setup = this.setup.bind(this);
     this.handler = this.handler.bind(this);
     this.onSchedule = this.onSchedule.bind(this);
   }
@@ -59,7 +59,11 @@ class BaseWorker {
     };
   }
 
-  async preStart() { }
+  async setup() { }
+
+  async preStart() {
+    await this.setup();
+  }
 }
 
 export default BaseWorker;
