@@ -1,4 +1,4 @@
-import { launch } from 'puppeteer'
+import { launch, Browser } from 'puppeteer'
 import axios from 'axios'
 
 export class Oatstalk {
@@ -32,7 +32,7 @@ export class BaseWorker {
 }
 
 export class PuppeteerWorker extends BaseWorker {
-  browser: puppeteer.Browser
+  browser: Browser
 }
 
 export class BasePusher<scheduleInterval> {
@@ -44,6 +44,17 @@ export class BasePusher<scheduleInterval> {
   handler(): Promise<void>
   setup(): Promise<void>
 }
+
+export interface Scheduler {
+  start(findInterval: number): void
+  tasks: Object<string, { interval: number, fn(): void, nextRun: number }>
+  running: boolean
+  nodeInterval: null
+  addTask(name: string, fn: Function, interval = 5000): void
+  removeTask(name: string): void
+  stop(): void
+}
+export const scheduler: Scheduler
 
 export {
   launch,
