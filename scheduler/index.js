@@ -20,6 +20,7 @@ const scheduler = {
     }, findInterval);
   },
   addTask(name, fn, interval = 5000) {
+    if (typeof interval !== 'number') interval = 5000;
     this.tasks[name] = {
       interval,
       fn,
