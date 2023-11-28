@@ -17,30 +17,35 @@ class BaseWorker {
   }
 
   async start(usedJob) {
-    await this.preStart();
+    try {
+      await this.preStart();
 
-    if (this.workStack > 1) {
-      let jobs = usedJob || await this.oatstalk.put(this.workStack);
+      if (this.workStack > 1) {
+        let jobs = usedJob || await this.oatstalk.put(this.workStack);
 
-      while (jobs !== null) {
-        await Promise.all(jobs.map((job) => this.handler(job)));
-        jobs = await this.oatstalk.put(this.workStack);
+        while (jobs !== null) {
+          await Promise.all(jobs.map((job) => this.handler(job)));
+          jobs = await this.oatstalk.put(this.workStack);
+        }
+      } else {
+        let job = usedJob || await this.oatstalk.put();
+
+        while (job !== null) {
+          await this.handler(job);
+          job = await this.oatstalk.put();
+        }
       }
-    } else {
-      let job = usedJob || await this.oatstalk.put();
+    } catch (error) {
+      throw error;
+    } finally {
+      await this.onJobEmpty();
 
-      while (job !== null) {
-        await this.handler(job);
-        job = await this.oatstalk.put();
+      if (this.options?.useScheduler) {
+        console.log('useScheduler');
+        scheduler.addTask(this.workerId, this.onSchedule, this.options.useScheduler === true ? undefined : this.options.useScheduler);
       }
     }
 
-    await this.onJobEmpty();
-
-    if (this.options?.useScheduler) {
-      console.log('useScheduler');
-      scheduler.addTask(this.workerId, this.onSchedule, this.options.useScheduler === true ? undefined : this.options.useScheduler);
-    }
   }
 
   async handler(job) {
