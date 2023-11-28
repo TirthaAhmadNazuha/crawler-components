@@ -35,17 +35,21 @@ class BaseWorker {
           job = await this.oatstalk.put();
         }
       }
-    } catch (error) {
-      throw error;
-    } finally {
       await this.onJobEmpty();
 
       if (this.options?.useScheduler) {
         console.log('useScheduler');
         scheduler.addTask(this.workerId, this.onSchedule, this.options.useScheduler === true ? undefined : this.options.useScheduler);
       }
-    }
+    } catch (error) {
+      await this.onJobEmpty();
 
+      if (this.options?.useScheduler) {
+        console.log('useScheduler');
+        scheduler.addTask(this.workerId, this.onSchedule, this.options.useScheduler === true ? undefined : this.options.useScheduler);
+      }
+      throw error;
+    }
   }
 
   async handler(job) {
